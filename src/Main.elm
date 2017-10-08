@@ -5,6 +5,7 @@ import Html.Attributes exposing (src)
 import Html.Events exposing (onClick)
 import Http
 import Json.Decode as Decode
+import RemoteData exposing (..)
 
 
 host : String
@@ -36,7 +37,9 @@ fetchUser =
 
 requestUser : Cmd Msg
 requestUser =
-    Http.send RequestUser fetchUser
+    fetchUser
+        |> RemoteData.sendRequest
+        |> Cmd.map UserResponse
 
 
 type alias User =
@@ -67,15 +70,13 @@ emptyUser =
 
 
 type alias Model =
-    { user : User
-    , error : String
+    { user : WebData User
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( { user = emptyUser
-      , error = ""
+    ( { user = NotAsked
       }
     , Cmd.none
     )
@@ -87,7 +88,7 @@ init =
 
 type Msg
     = FetchUser
-    | RequestUser (Result Http.Error User)
+    | UserResponse (WebData User)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -96,11 +97,8 @@ update msg model =
         FetchUser ->
             ( model, requestUser )
 
-        RequestUser (Ok res) ->
+        UserResponse res ->
             ( { model | user = res }, Cmd.none )
-
-        RequestUser (Err e) ->
-            ( { model | error = toString e }, Cmd.none )
 
 
 
@@ -110,13 +108,38 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ img [ src "/logo.svg" ] []
+        [ img
+            [ src
+                (case model.user of
+                    NotAsked ->
+                        "/logo.svg"
+
+                    Loading ->
+                        "/logo.svg"
+
+                    Failure err ->
+                        "/logo.svg"
+
+                    Success user ->
+                        user.avatarUrl
+                )
+            ]
+            []
         , div []
-            [ text "This is your brain on Elm!"
-            , div
-                []
-                [ text model.user.name
-                ]
+            [ text
+                (case model.user of
+                    NotAsked ->
+                        "Initializing..."
+
+                    Loading ->
+                        "Loading..."
+
+                    Failure err ->
+                        "Error: " ++ toString err
+
+                    Success user ->
+                        user.name
+                )
             ]
         , button [ onClick FetchUser ] [ text "Fetch user" ]
         ]
