@@ -1,6 +1,6 @@
 module Main exposing (..)
 
-import Components.Links.Twitter exposing (viewTwitter)
+import Components.Links.View exposing (viewLinks)
 import Html exposing (Html, button, div, img, text)
 import Html.Attributes exposing (class, src)
 import Model exposing (Model)
@@ -54,7 +54,7 @@ view model =
                 Success user ->
                     div []
                         [ text user.name
-                        , viewTwitter user.links.twitter
+                        , viewLinks user.links
                         ]
             ]
         ]
