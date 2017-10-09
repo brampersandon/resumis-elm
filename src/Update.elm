@@ -6,18 +6,23 @@ import Model exposing (Model)
 
 type Msg
     = FetchUser
+    | CreateAPI String
     | UserResponse WebDataUser
 
 
-updateUser =
-    requestUser |> Cmd.map UserResponse
+updateUser : String -> Cmd Msg
+updateUser root =
+    requestUser root |> Cmd.map UserResponse
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         FetchUser ->
-            ( model, updateUser )
+            ( model, updateUser model.apiRoot )
+
+        CreateAPI apiRoot ->
+            ( { model | apiRoot = apiRoot }, Cmd.none )
 
         UserResponse res ->
             ( { model | user = res }, Cmd.none )

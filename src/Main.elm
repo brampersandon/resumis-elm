@@ -8,11 +8,17 @@ import RemoteData exposing (..)
 import Update exposing (Msg, update, updateUser)
 
 
-init : ( Model, Cmd Msg )
-init =
+type alias Flags =
+    { apiRoot : String
+    }
+
+
+init : Flags -> ( Model, Cmd Msg )
+init flags =
     ( { user = NotAsked
+      , apiRoot = flags.apiRoot
       }
-    , updateUser
+    , updateUser flags.apiRoot
     )
 
 
@@ -64,9 +70,9 @@ view model =
 ---- PROGRAM ----
 
 
-main : Program Never Model Msg
+main : Program Flags Model Msg
 main =
-    Html.program
+    Html.programWithFlags
         { view = view
         , init = init
         , update = Update.update

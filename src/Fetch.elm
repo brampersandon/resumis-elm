@@ -4,17 +4,11 @@ import Http
 import Json.Decode as Decode
 
 
-host : String
-host =
-    "http://localhost:5000"
-
-
-
 ---- FETCH ----
 
 
-fetch : String -> Decode.Decoder a -> Http.Request a
-fetch url decoder =
+fetch : String -> String -> Decode.Decoder a -> Http.Request a
+fetch host url decoder =
     Http.request
         { method = "GET"
         , headers = [ Http.header "X-Resumis-Version" "v1", Http.header "Accept" "application/vnd.resume+json" ]

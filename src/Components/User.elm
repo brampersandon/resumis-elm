@@ -6,14 +6,14 @@ import Json.Decode as Decode
 import RemoteData exposing (..)
 
 
-fetchUser : Http.Request User
-fetchUser =
-    fetch "/api/users/1" decodeUser
+fetchUser : String -> Http.Request User
+fetchUser root =
+    fetch root "/api/users/1" decodeUser
 
 
-requestUser : Cmd WebDataUser
-requestUser =
-    fetchUser
+requestUser : String -> Cmd WebDataUser
+requestUser root =
+    fetchUser root
         |> RemoteData.sendRequest
 
 
