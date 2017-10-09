@@ -16,10 +16,15 @@ iconForLink link =
 
 viewLink : Link -> Html Msg
 viewLink link =
-    div [ class link.meta.rel ]
-        [ iconForLink link
-        , a [ href link.href ] [ text link.meta.title ]
-        ]
+    case String.isEmpty link.meta.title of
+        True ->
+            div [] []
+
+        False ->
+            div [ class link.meta.rel ]
+                [ iconForLink link
+                , a [ href link.href ] [ text link.meta.title ]
+                ]
 
 
 viewLinks : Links -> Html Msg
