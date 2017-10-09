@@ -1,54 +1,19 @@
 module Main exposing (..)
 
-import Components.User exposing (..)
+import Components.Links.Twitter exposing (viewTwitter)
 import Html exposing (Html, button, div, img, text)
-import Html.Attributes exposing (src)
-import Html.Events exposing (onClick)
-import Http
-import Json.Decode as Decode
+import Html.Attributes exposing (class, src)
+import Model exposing (Model)
 import RemoteData exposing (..)
-
-
----- MODEL ----
-
-
-type alias Model =
-    { user : WebData User
-    }
+import Update exposing (Msg, update, updateUser)
 
 
 init : ( Model, Cmd Msg )
 init =
     ( { user = NotAsked
       }
-    , Cmd.none
+    , updateUser
     )
-
-
-
----- UPDATE ----
-
-
-type Msg
-    = FetchUser
-    | UserResponse (WebData User)
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
-        FetchUser ->
-            ( model, requestUser )
-
-        UserResponse res ->
-            ( { model | user = res }, Cmd.none )
-
-
-requestUser : Cmd Msg
-requestUser =
-    fetchUser
-        |> RemoteData.sendRequest
-        |> Cmd.map UserResponse
 
 
 
@@ -76,22 +41,22 @@ view model =
             ]
             []
         , div []
-            [ text
-                (case model.user of
-                    NotAsked ->
-                        "Initializing..."
+            [ case model.user of
+                NotAsked ->
+                    text "Initializing..."
 
-                    Loading ->
-                        "Loading..."
+                Loading ->
+                    text "Loading..."
 
-                    Failure err ->
-                        "Error: " ++ toString err
+                Failure err ->
+                    text ("Error: " ++ toString err)
 
-                    Success user ->
-                        user.name
-                )
+                Success user ->
+                    div []
+                        [ text user.name
+                        , viewTwitter user.links.twitter
+                        ]
             ]
-        , button [ onClick FetchUser ] [ text "Fetch user" ]
         ]
 
 
@@ -104,6 +69,6 @@ main =
     Html.program
         { view = view
         , init = init
-        , update = update
+        , update = Update.update
         , subscriptions = always Sub.none
         }
