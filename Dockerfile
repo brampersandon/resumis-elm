@@ -5,7 +5,11 @@ WORKDIR /usr/src/app
 
 COPY . /usr/src/app
 RUN yarn
+RUN yarn build
 
-EXPOSE 3000
+RUN mkdir -p /var/www/resumis-elm
+RUN cp -R build/ /var/www/resumis-elm
 
-CMD ["yarn", "start"]
+VOLUME /var/www
+
+CMD ["echo", "elm app build complete"]
